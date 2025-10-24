@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "public": "build/web",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "max-age=0, s-maxage=31536000" }
+      ]
+    }
+  ]
+}
