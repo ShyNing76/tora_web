@@ -9,6 +9,7 @@ import '../widgets/chapter_card.dart';
 import 'lesson_detail_screen.dart';
 import 'quiz_detail_screen.dart';
 import '../../payment/views/payment_screen.dart';
+import '../../payment/views/coupon_payment_screen.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   final Course course;
@@ -413,45 +414,109 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   }
 
   void _enrollCourse() {
-    // If course is paid, show confirmation dialog first
+    // If course is paid, show payment options dialog
     if (widget.course.isPaid && widget.course.price != null) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Xác nhận đăng ký'),
-            content: Text(
-              'Bạn có muốn đăng ký khóa học "${widget.course.name}" với giá ${CurrencyUtils.formatVND(widget.course.price)} không?',
+            title: const Text('Chọn phương thức thanh toán'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Khóa học: ${widget.course.name}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Giá: ${CurrencyUtils.formatVND(widget.course.price)}',
+                  style: const TextStyle(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Bank Transfer Option
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  title: const Text('Chuyển khoản ngân hàng'),
+                  subtitle: const Text('Thanh toán qua QR Code'),
+                  onTap: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    // Navigate to payment screen
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PaymentScreen(
+                          courseId: widget.course.id,
+                          courseName: widget.course.name,
+                          amount: widget.course.price!,
+                        ),
+                      ),
+                    ).then((success) {
+                      // If payment successful, reload course progress
+                      if (success == true) {
+                        _loadCourseProgress();
+                      }
+                    });
+                  },
+                ),
+                const Divider(),
+                // Coupon Code Option
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.successColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.local_offer,
+                      color: AppColors.successColor,
+                    ),
+                  ),
+                  title: const Text('Sử dụng mã Coupon'),
+                  subtitle: const Text('Giảm giá hoặc miễn phí'),
+                  onTap: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    // Navigate to coupon payment screen
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CouponPaymentScreen(
+                          courseId: widget.course.id,
+                          courseName: widget.course.name,
+                        ),
+                      ),
+                    ).then((success) {
+                      // If payment successful, reload course progress
+                      if (success == true) {
+                        _loadCourseProgress();
+                      }
+                    });
+                  },
+                ),
+              ],
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Hủy'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close dialog
-                  // Navigate to payment screen
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PaymentScreen(
-                        courseId: widget.course.id,
-                        courseName: widget.course.name,
-                        amount: widget.course.price!,
-                      ),
-                    ),
-                  ).then((success) {
-                    // If payment successful, reload course progress
-                    if (success == true) {
-                      _loadCourseProgress();
-                    }
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Xác nhận'),
               ),
             ],
           );

@@ -347,16 +347,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          // Debug button to test dialog
-          IconButton(
-            icon: const Icon(Icons.bug_report, color: AppColors.primaryColor),
-            onPressed: () {
-              print('🐛 Debug button pressed - testing dialog');
-              _showPaymentSuccessDialog();
-            },
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

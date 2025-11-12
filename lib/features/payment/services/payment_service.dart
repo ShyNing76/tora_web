@@ -8,14 +8,21 @@ class PaymentService {
   Future<Map<String, dynamic>> createPayment({
     required String orderType,
     required String referenceId,
+    String? couponCode,
   }) async {
     try {
+      final data = {
+        'orderType': orderType,
+        'referenceId': referenceId,
+      };
+      
+      if (couponCode != null && couponCode.isNotEmpty) {
+        data['couponCode'] = couponCode;
+      }
+      
       final response = await _apiService.post<Map<String, dynamic>>(
         '/payment/api/Payment/create-payment',
-        data: {
-          'orderType': orderType,
-          'referenceId': referenceId,
-        },
+        data: data,
       );
       
       if (response.statusCode == 200 || response.statusCode == 201) {
