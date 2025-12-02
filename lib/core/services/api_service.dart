@@ -18,6 +18,9 @@ class ApiService {
     _setupInterceptors();
   }
 
+  // Expose Dio instance for advanced usage (e.g., streaming)
+  Dio get dio => _dio;
+
   void _setupCookies() async {
     try {
       // Tạo persistent cookie jar để lưu cookies
